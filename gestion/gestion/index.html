@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Outil billetterie – You Kalama</title>
+<style>
+:root{--bg:#F5F6F2;--card:#fff;--ink:#0B2A3A;--mut:#4F6672;--line:#D5DCD7;--sun:#FFC21A;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#081C27;--card:#10303F;--ink:#EEF2EE;--mut:#9DB3BE;--line:#1E4456}}
+:root[data-theme="dark"]{--bg:#081C27;--card:#10303F;--ink:#EEF2EE;--mut:#9DB3BE;--line:#1E4456}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:560px;margin:0 auto;padding:14px}
+h1{font-size:22px;margin:0 0 10px}h2{font-size:18px;margin:16px 0 8px}
+nav{display:flex;gap:6px;margin-bottom:12px}
+nav button{flex:1;padding:12px 4px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 15px system-ui,sans-serif}
+nav button[aria-selected="true"]{background:var(--sun);border-color:var(--sun);color:#0B2A3A}
+.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+label{display:block;font-weight:600;margin-top:10px}
+input,select{width:100%;padding:12px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:400 16px system-ui,sans-serif;margin-top:4px}
+input[type=checkbox]{width:22px;height:22px;margin:0 8px 0 0;vertical-align:middle}
+.b{display:inline-block;border:0;border-radius:999px;padding:12px 18px;font:700 15px system-ui,sans-serif;background:var(--sun);color:#0B2A3A;text-decoration:none;cursor:pointer;margin:8px 6px 0 0}
+.b.o{background:transparent;border:2px solid currentColor;color:var(--ink)}
+.b[disabled]{opacity:.5;pointer-events:none}
+.msg{padding:10px;border-radius:10px;background:#FDE2E2;color:#7A1111;margin-top:10px}
+.warn{padding:10px;border-radius:10px;background:#FFF1BF;color:#5B4300;margin-bottom:10px}
+.res{border-radius:18px;padding:22px;text-align:center;color:#fff;margin:10px 0}
+.res b{font-size:30px;display:block}
+.ok{background:#168A3C}.used{background:#D97706}.bad{background:#C62828}
+.tk img{width:100%;border-radius:12px;border:1px solid var(--line)}
+.st{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.st div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}.st b{font-size:20px;display:block}
+video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;background:#000}
+.sm{font-size:14px;color:var(--mut)}
+.tag{font-size:13px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--line)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.bar .sm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .b{margin:0;padding:8px 14px}
+:focus-visible{outline:3px solid #E63E6D;outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="w">
+<h1>Billetterie : Concert You Kalama</h1>
+<div id="ban"></div>
+
+<!-- Connexion -->
+<section id="login" hidden>
+<form id="lf" class="c">
+<p class="sm">Réservé à l’équipe. Connectez-vous avec le compte que l’organisateur vous a donné.</p>
+<label for="em">E-mail</label><input id="em" type="email" autocomplete="username" autocapitalize="off" required>
+<label for="pw">Mot de passe</label><input id="pw" type="password" autocomplete="current-password" required>
+<button class="b" type="submit" id="lb">Se connecter</button>
+<div id="lm"></div>
+</form>
+</section>
+
+<!-- Application -->
+<div id="app" hidden>
+<div class="bar"><span class="sm" id="who"></span><button class="b o" id="out2" type="button">Déconnexion</button></div>
+<nav role="tablist">
+<button role="tab" data-t="e" aria-selected="true">Émettre</button>
+<button role="tab" data-t="c" aria-selected="false">Contrôle</button>
+<button role="tab" data-t="l" aria-selected="false">Liste</button>
+</nav>
+
+<section id="t-e">
+<form id="f" class="c" autocomplete="off">
+<label for="n">Nom de l’acheteur</label><input id="n" required>
+<label for="p">Téléphone WhatsApp (facultatif)</label><input id="p" type="tel" inputmode="tel" placeholder="77 123 45 67">
+<label for="cat">Catégorie</label><select id="cat"><option value="500">500 F</option><option value="1000">1 000 F</option></select>
+<label for="q">Nombre de billets</label><input id="q" type="number" min="1" max="10" value="1" required>
+<label for="r">Référence du paiement Wave</label><input id="r" required placeholder="Telle qu’affichée dans votre application Wave">
+<label for="a">Montant reçu dans Wave (F)</label><input id="a" type="number" min="0" inputmode="numeric" required>
+<label><input type="checkbox" id="ok">J’ai vérifié ce paiement dans MON application Wave</label>
+<button class="b" type="submit" id="sb">Créer le(s) billet(s)</button>
+<div id="m"></div>
+</form>
+<div id="out"></div>
+</section>
+
+<section id="t-c" hidden>
+<div class="c">
+<button class="b" id="cam" type="button">Scanner avec la caméra</button><button class="b o" id="camoff" type="button" hidden>Arrêter la caméra</button>
+<p class="sm" id="camerr"></p>
+<video id="v" playsinline muted hidden></video><canvas id="cv" hidden></canvas>
+<form id="mf"><label for="code">Ou saisir le code du billet</label><input id="code" placeholder="YK-XXXX-XXXX" autocapitalize="characters"><button class="b" type="submit">Vérifier</button></form>
+</div>
+<div id="res" role="status" aria-live="assertive"></div>
+</section>
+
+<section id="t-l" hidden>
+<div class="st" id="st"></div>
+<div class="c"><label for="s">Rechercher (nom, code, référence)</label><input id="s" type="search">
+<button class="b" id="rf" type="button">Actualiser</button><button class="b o" id="csv" type="button">Export Excel (CSV)</button>
+<div id="lmsg" class="sm"></div></div>
+<div id="list"></div>
+</section>
+</div>
+</main>
+
+<script src="config.js"></script>
+<script>
+const EV={name:"Concert You Kalama",date:"24 décembre 2026",place:"Terrain Central",cap:700};
+const CFG=window.YK_CONFIG||{};
+const SK="yk-session-v1";
+const $=s=>document.querySelector(s);
+const h=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){if(k==="class")e.className=a[k];else if(k.startsWith("on"))e.addEventListener(k.slice(2),a[k]);else e.setAttribute(k,a[k])}for(const x of c.flat())e.append(x);return e};
+const fmt=n=>n.toLocaleString("fr-FR").replace(/[\u202f\u00a0]/g," ")+" F";
+const hm=ts=>new Date(ts).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+const short=e=>String(e||"").split("@")[0];
+
+/* ---------- Bibliothèques QR : dossier vendor/ d'abord, cdnjs en secours ---------- */
+function load(srcs){return new Promise(res=>{let i=0;const n=()=>{if(i>=srcs.length)return res(false);const s=document.createElement("script");s.src=srcs[i++];s.onload=()=>res(true);s.onerror=()=>{s.remove();n()};document.head.append(s)};n()})}
+const libs=Promise.all([
+ load(["vendor/qrcode.min.js","https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"]),
+ load(["vendor/jsQR.min.js","https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"])]);
+
+/* ---------- Session et appels à la base ---------- */
+let sess=null;
+try{sess=JSON.parse(localStorage.getItem(SK)||"null")}catch(e){}
+const saveSess=()=>{try{sess?localStorage.setItem(SK,JSON.stringify(sess)):localStorage.removeItem(SK)}catch(e){}};
+const configured=()=>/^https:\/\/.+\.supabase\.co/.test(CFG.SUPABASE_URL||"")&&(CFG.SUPABASE_ANON_KEY||"").length>40;
+function setSess(d,email){sess={access_token:d.access_token,refresh_token:d.refresh_token,exp:d.expires_at||Math.floor(Date.now()/1000)+(d.expires_in||3600),email:email||sess?.email};saveSess()}
+async function authCall(grant,body){
+ let r;try{r=await fetch(CFG.SUPABASE_URL+"/auth/v1/token?grant_type="+grant,{method:"POST",headers:{apikey:CFG.SUPABASE_ANON_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)})}catch(e){throw new Error("Pas de réseau.")}
+ const j=await r.json().catch(()=>({}));
+ if(!r.ok){const e=new Error(j.error_description||j.msg||j.message||"Erreur de connexion");e.status=r.status;throw e}
+ return j}
+async function refresh(){
+ try{const d=await authCall("refresh_token",{refresh_token:sess.refresh_token});setSess(d,d.user?.email);return true}
+ catch(e){if(e.status&&e.status>=400&&e.status<500){sess=null;saveSess()}return false}}
+async function api(path,{method="GET",body}={},retry=true){
+ if(!sess)throw new Error("Non connecté.");
+ if(sess.exp-Date.now()/1000<90)await refresh();
+ if(!sess)throw new Error("Session expirée, reconnectez-vous.");
+ let r;
+ try{r=await fetch(CFG.SUPABASE_URL+path,{method,headers:{apikey:CFG.SUPABASE_ANON_KEY,Authorization:"Bearer "+sess.access_token,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined})}
+ catch(e){throw new Error("Pas de réseau.")}
+ if(r.status===401&&retry){if(await refresh())return api(path,{method,body},false);showLogin("Session expirée, reconnectez-vous.");throw new Error("Session expirée.")}
+ const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){}
+ if(!r.ok)throw new Error((j&&(j.message||j.msg))||"Erreur "+r.status);
+ return j}
+const rpc=(fn,args)=>api("/rest/v1/rpc/"+fn,{method:"POST",body:args});
+
+function showLogin(msg){stopCam();sess=sess&&null;saveSess();$("#app").hidden=true;$("#login").hidden=false;$("#lm").replaceChildren(msg?h("div",{class:"msg"},msg):"")}
+function showApp(){$("#login").hidden=true;$("#app").hidden=false;$("#who").textContent="Connecté : "+(sess.email||"")}
+$("#lf").addEventListener("submit",async e=>{e.preventDefault();const b=$("#lb");b.disabled=true;$("#lm").replaceChildren();
+ try{const em=$("#em").value.trim(),d=await authCall("password",{email:em,password:$("#pw").value});setSess(d,d.user?.email||em);$("#pw").value="";showApp()}
+ catch(x){$("#lm").replaceChildren(h("div",{class:"msg"},x.message==="Invalid login credentials"?"E-mail ou mot de passe incorrect.":x.message))}
+ b.disabled=false});
+$("#out2").addEventListener("click",()=>showLogin());
+
+/* ---------- Onglets ---------- */
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
+ for(const k of["e","c","l"])$("#t-"+k).hidden=k!==b.dataset.t;
+ if(b.dataset.t!=="c")stopCam();if(b.dataset.t==="l")loadList()}));
+
+/* ---------- Image du billet ---------- */
+function draw(t){const c=document.createElement("canvas");c.width=900;c.height=1250;const x=c.getContext("2d");
+ x.fillStyle="#fff";x.fillRect(0,0,900,1250);x.fillStyle="#FFC21A";x.fillRect(0,0,900,300);
+ x.fillStyle="#0B2A3A";x.textAlign="center";x.font="800 70px system-ui,sans-serif";x.fillText("CONCERT",450,120);x.fillText("YOU KALAMA",450,205);
+ x.font="600 34px system-ui,sans-serif";x.fillText(EV.date+" · "+EV.place,450,265);
+ x.font="800 64px system-ui,sans-serif";x.fillText("Billet "+fmt(t.cat),450,400);
+ x.font="600 40px system-ui,sans-serif";x.fillText(t.name.slice(0,34),450,470);
+ if(typeof qrcode!=="undefined"){const q=qrcode(0,"M");q.addData(t.code);q.make();const n=q.getModuleCount(),cs=Math.floor(560/n),sz=cs*n,ox=450-sz/2,oy=520;
+  for(let r=0;r<n;r++)for(let k=0;k<n;k++){x.fillStyle=q.isDark(r,k)?"#000":"#fff";x.fillRect(ox+k*cs,oy+r*cs,cs,cs)}}
+ else{x.font="600 30px system-ui,sans-serif";x.fillText("QR indisponible : utilisez le code",450,800)}
+ x.fillStyle="#0B2A3A";x.font="800 56px ui-monospace,Menlo,monospace";x.fillText(t.code,450,1150);
+ x.font="500 28px system-ui,sans-serif";x.fillText("Un billet = une seule entrée",450,1205);return c}
+function saveBlob(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
+const waNum=p=>{const d=(p||"").replace(/\D/g,"");return d.length===9?"221"+d:d.length===12&&d.startsWith("221")?d:""};
+function card(t){const cv=draw(t),url=cv.toDataURL("image/png");
+ const msg="Bonjour "+t.name+", voici votre billet pour le Concert You Kalama ("+EV.date+"). Code : "+t.code+". Un billet ne permet qu’une seule entrée.";
+ const blob=()=>new Promise(r=>cv.toBlob(r,"image/png"));
+ const w=waNum(t.phone);
+ const btns=[h("button",{class:"b",type:"button",onclick:async()=>saveBlob("billet-"+t.code+".png",await blob())},"Télécharger l’image")];
+ if(navigator.canShare&&navigator.share)btns.push(h("button",{class:"b",type:"button",onclick:async()=>{try{const f=new File([await blob()],"billet-"+t.code+".png",{type:"image/png"});if(navigator.canShare({files:[f]}))await navigator.share({files:[f],text:msg});else saveBlob(f.name,f)}catch(e){}}},"Partager (WhatsApp…)"));
+ if(w)btns.push(h("a",{class:"b o",href:"https://wa.me/"+w+"?text="+encodeURIComponent(msg),target:"_blank",rel:"noopener noreferrer"},"Ouvrir la discussion WhatsApp"));
+ return h("div",{class:"c tk"},h("img",{src:url,alt:"Billet "+t.code}),...btns,h("p",{class:"sm"},"Envoyez l’image du billet à l’acheteur sur WhatsApp."))}
+
+/* ---------- Émettre ---------- */
+$("#f").addEventListener("submit",async e=>{e.preventDefault();const m=$("#m"),sb=$("#sb"),err=s=>m.replaceChildren(h("div",{class:"msg"},s));m.replaceChildren();
+ const name=$("#n").value.trim(),phone=$("#p").value.trim(),cat=+$("#cat").value,qty=Math.floor(+$("#q").value),ref=$("#r").value.trim().toUpperCase(),amt=Math.round(+$("#a").value);
+ if(!$("#ok").checked)return err("Cochez la case : le paiement doit être vérifié dans votre application Wave.");
+ if(!name||!ref||qty<1||qty>10)return err("Vérifiez le nom, la référence et le nombre de billets (1 à 10).");
+ if(amt!==cat*qty)return err("Montant incorrect. Pour "+qty+" billet(s) à "+fmt(cat)+", il faut "+fmt(cat*qty)+".");
+ sb.disabled=true;
+ try{await libs;const rows=await rpc("issue_tickets",{p_name:name,p_phone:phone,p_cat:cat,p_qty:qty,p_ref:ref,p_amount:amt});
+  $("#out").replaceChildren(...rows.map(card));e.target.reset();$("#q").value=1;$("#out").scrollIntoView()}
+ catch(x){err(x.message)}
+ sb.disabled=false});
+
+/* ---------- Contrôle ---------- */
+let stream,raf=0,tick=0,last={c:"",at:0},busy=false,wake=null;
+function show(cls,title,sub){$("#res").replaceChildren(h("div",{class:"res "+cls},h("b",{},title),sub||""));navigator.vibrate?.(cls==="ok"?80:[120,60,120])}
+async function check(raw){
+ if(busy)return;busy=true;
+ try{const r=await rpc("scan_ticket",{p_code:raw}),t=r.ticket;
+  if(r.result==="ok")show("ok","VALIDE",fmt(t.cat)+" · "+t.name+" · "+t.code);
+  else if(r.result==="used")show("used","DÉJÀ UTILISÉ","Entré à "+hm(t.used_at)+(t.used_by?" (porte "+short(t.used_by)+")":"")+" · "+t.name+" · "+t.code);
+  else if(r.result==="cancelled")show("bad","ANNULÉ",t.code);
+  else show("bad","INVALIDE","Ce code n’existe pas.")}
+ catch(x){last={c:"",at:0};show("bad","ERREUR",x.message+" Le billet n’a PAS été validé. Réessayez.")}
+ busy=false}
+$("#mf").addEventListener("submit",e=>{e.preventDefault();check($("#code").value);$("#code").value=""});
+async function startCam(){
+ await libs;
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});const v=$("#v");v.srcObject=stream;await v.play();v.hidden=false;$("#camoff").hidden=false;$("#camerr").textContent="";
+  try{wake=await navigator.wakeLock?.request("screen")}catch(e){}
+  loop()}
+ catch(e){$("#camerr").textContent="Caméra indisponible. Autorisez la caméra dans le navigateur, ou saisissez le code."}}
+function stopCam(){cancelAnimationFrame(raf);stream?.getTracks().forEach(t=>t.stop());stream=null;try{wake?.release()}catch(e){}wake=null;$("#v").hidden=true;$("#camoff").hidden=true}
+function loop(){raf=requestAnimationFrame(loop);const now=Date.now(),v=$("#v");if(now-tick<120||v.readyState<2||typeof jsQR==="undefined")return;tick=now;
+ const c=$("#cv"),x=c.getContext("2d",{willReadFrequently:true});c.width=v.videoWidth;c.height=v.videoHeight;x.drawImage(v,0,0);
+ const r=jsQR(x.getImageData(0,0,c.width,c.height).data,c.width,c.height);
+ if(r&&!busy&&(r.data!==last.c||now-last.at>4000)){last={c:r.data,at:now};check(r.data)}}
+$("#cam").addEventListener("click",startCam);$("#camoff").addEventListener("click",stopCam);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stopCam()});
+
+/* ---------- Liste ---------- */
+let T=[];
+async function loadList(){const lm=$("#lmsg");lm.textContent="Chargement…";
+ try{T=await api("/rest/v1/tickets?select=*&order=created_at.desc&limit=1000");lm.textContent="Mis à jour à "+hm(Date.now())+".";render()}
+ catch(x){lm.textContent="Impossible d’actualiser : "+x.message}}
+const act=()=>T.filter(t=>t.status!=="cancelled");
+function render(){const a=act(),by=c=>a.filter(t=>t.cat===c).length,used=a.filter(t=>t.status==="used").length;
+ $("#st").replaceChildren(...[["Billets émis",a.length+" / "+EV.cap],["Entrés",used],["À 500 F",by(500)],["À 1 000 F",by(1000)],["Ventes déclarées",fmt(by(500)*500+by(1000)*1000)],["Places restantes",EV.cap-a.length]].map(([l,v])=>h("div",{},h("b",{},String(v)),l)));
+ const q=$("#s").value.trim().toLowerCase(),rows=T.filter(t=>!q||(t.name+t.code+t.ref).toLowerCase().includes(q));
+ $("#list").replaceChildren(...rows.map(t=>h("div",{class:"c"},h("b",{},t.name)," ",h("span",{class:"tag"},t.status==="valid"?"Valide":t.status==="used"?"Utilisé "+hm(t.used_at):"Annulé"),
+  h("div",{class:"sm"},t.code+" · "+fmt(t.cat)+" · réf. "+t.ref+(t.created_by?" · par "+short(t.created_by):"")),
+  h("button",{class:"b o",type:"button",onclick:async()=>{await libs;$("#out").replaceChildren(card(t));document.querySelector('nav [data-t="e"]').click()}},"Revoir le billet"),
+  t.status==="valid"?h("button",{class:"b o",type:"button",onclick:async()=>{if(!confirm("Annuler le billet "+t.code+" ?"))return;try{await rpc("cancel_ticket",{p_code:t.code});loadList()}catch(x){alert(x.message)}}},"Annuler"):"")))}
+$("#s").addEventListener("input",render);$("#rf").addEventListener("click",loadList);
+const cell=v=>{let s=String(v??"");if(/^[=+\-@\t\r]/.test(s))s="'"+s;return/[";\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+$("#csv").addEventListener("click",()=>{const d=new Date(),f=x=>x?new Date(x).toLocaleString("fr-FR"):"";
+ const txt="\uFEFF"+[["Code","Nom","Téléphone","Prix","Référence Wave","Statut","Émis","Émis par","Entré","Contrôlé par"],...T.map(t=>[t.code,t.name,t.phone||"",t.cat,t.ref,t.status,f(t.created_at),t.created_by||"",f(t.used_at),t.used_by||""])].map(r=>r.map(cell).join(";")).join("\r\n");
+ saveBlob("billets-you-kalama-"+d.toISOString().slice(0,10)+".csv",new Blob([txt],{type:"text/csv;charset=utf-8"}))});
+
+/* ---------- Démarrage ---------- */
+if(!configured()){$("#ban").replaceChildren(h("div",{class:"msg"},"Configuration manquante : ouvrez le fichier gestion/config.js et collez l’adresse et la clé publique de votre projet Supabase."))}
+else if(sess){showApp();refresh().then(ok=>{if(!sess)showLogin("Session expirée, reconnectez-vous.")})}
+else showLogin();
+</script>
+</body>
+</html>
