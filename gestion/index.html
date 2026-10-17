@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Concert You Kalama – 24 décembre 2026</title>
+<style>
+:root{--bg:#0B2A3A;--card:#12384C;--ink:#F5F6F2;--mut:#A9C0CB;--sun:#FFC21A;--ok:#25D366;--line:#2A5368;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B2A3A}}
+:root[data-theme="dark"]{--bg:#0B2A3A}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:520px;margin:0 auto;padding:18px}
+.ticket{background:var(--sun);color:#0B2A3A;border-radius:22px;padding:24px 20px;position:relative}
+.ticket h1{margin:0;font-size:clamp(34px,10vw,52px);line-height:1.05;font-weight:800;letter-spacing:-.02em}
+.ticket p{margin:8px 0 0;font-weight:600}
+h2{font-size:22px;margin:28px 0 10px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.px{font-size:24px;font-weight:800}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:44px;height:44px;border-radius:50%;border:2px solid var(--sun);background:transparent;color:var(--sun);font-size:24px;font-weight:700}
+.qty output{min-width:24px;text-align:center;font-size:20px;font-weight:700}
+.tot{font-size:20px;font-weight:800;margin:6px 0 0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px}
+.wave{font-size:28px;font-weight:800;letter-spacing:.04em;color:var(--sun)}
+input{width:100%;padding:13px;border-radius:12px;border:2px solid var(--line);background:#fff;color:#0B2A3A;font:400 16px system-ui,sans-serif;margin-top:8px}
+.btn{display:block;width:100%;text-align:center;border:0;border-radius:999px;padding:14px;font:700 17px system-ui,sans-serif;text-decoration:none;cursor:pointer;margin-top:12px}
+.btn.y{background:var(--sun);color:#0B2A3A}.btn.g{background:var(--ok);color:#06361A}
+.btn[aria-disabled="true"]{opacity:.45;pointer-events:none}
+ol{padding-left:20px;margin:0}li{margin-bottom:6px}
+.warn{color:var(--mut);font-size:14px;margin-top:14px}
+:focus-visible{outline:3px solid #fff;outline-offset:2px}
+</style>
+</head>
+<body>
+<main class="w">
+<div class="ticket">
+<h1>Concert You Kalama</h1>
+<p>24 décembre 2026<br>Terrain Central</p>
+</div>
+
+<h2>Choisissez vos billets</h2>
+<div class="row"><div><div class="px">500 F</div><div class="warn" style="margin:0">Billet simple</div></div>
+<div class="qty"><button type="button" data-p="500" data-d="-1" aria-label="Retirer un billet à 500 F">−</button><output id="o500">0</output><button type="button" data-p="500" data-d="1" aria-label="Ajouter un billet à 500 F">+</button></div></div>
+<div class="row"><div><div class="px">1 000 F</div><div class="warn" style="margin:0">Billet 1 000 F</div></div>
+<div class="qty"><button type="button" data-p="1000" data-d="-1" aria-label="Retirer un billet à 1 000 F">−</button><output id="o1000">0</output><button type="button" data-p="1000" data-d="1" aria-label="Ajouter un billet à 1 000 F">+</button></div></div>
+<p class="tot">Total : <span id="tot">0 F</span></p>
+
+<h2>Comment payer</h2>
+<ol>
+<li>Choisissez vos billets ci-dessus.</li>
+<li>Envoyez le total par <b>Wave</b> à ce numéro :</li>
+</ol>
+<div class="box"><div class="wave" id="num">76 723 99 53</div>
+<button class="btn y" id="copy" type="button" style="margin-top:8px">Copier le numéro</button></div>
+<ol start="3" style="margin-top:12px">
+<li>Remplissez votre nom et la référence du paiement Wave, puis envoyez-nous le message sur WhatsApp.</li>
+<li>Nous vérifions votre paiement et vous envoyons votre billet avec QR code.</li>
+</ol>
+
+<div class="box">
+<label for="nom"><b>Votre nom</b></label>
+<input id="nom" autocomplete="name" placeholder="Prénom et nom">
+<label for="ref" style="display:block;margin-top:10px"><b>Référence du paiement Wave</b></label>
+<input id="ref" placeholder="Reçue par SMS après le paiement" autocomplete="off">
+<a class="btn g" id="wa" href="#" aria-disabled="true" target="_blank" rel="noopener noreferrer">Envoyer sur WhatsApp</a>
+</div>
+
+<p class="warn">Payez uniquement au numéro affiché sur cette page. Le billet est envoyé après vérification du paiement. Un billet ne permet qu’une seule entrée : ne partagez pas son QR code.</p>
+</main>
+<script>
+const WAVE="221767239953";const q={500:0,1000:0};
+const fmt=n=>n.toLocaleString("fr-FR").replace(/[\u202f\u00a0]/g," ")+" F";
+function upd(){const t=q[500]*500+q[1000]*1000;
+document.getElementById("o500").textContent=q[500];document.getElementById("o1000").textContent=q[1000];
+document.getElementById("tot").textContent=fmt(t);
+const nom=document.getElementById("nom").value.trim(),ref=document.getElementById("ref").value.trim();
+const a=document.getElementById("wa"),ok=t>0&&nom&&ref;
+a.setAttribute("aria-disabled",ok?"false":"true");
+if(!ok){a.removeAttribute("href");return}
+const parts=[];if(q[500])parts.push(q[500]+" billet(s) à 500 F");if(q[1000])parts.push(q[1000]+" billet(s) à 1 000 F");
+const msg="Bonjour, je souhaite acheter "+parts.join(" et ")+" pour le Concert You Kalama (24 décembre 2026).\nTotal payé par Wave : "+fmt(t)+"\nNom : "+nom+"\nRéférence du paiement Wave : "+ref;
+a.href="https://wa.me/"+WAVE+"?text="+encodeURIComponent(msg)}
+document.querySelectorAll(".qty button").forEach(b=>b.addEventListener("click",()=>{const p=b.dataset.p;q[p]=Math.max(0,Math.min(10,q[p]+Number(b.dataset.d)));upd()}));
+["nom","ref"].forEach(i=>document.getElementById(i).addEventListener("input",upd));
+document.getElementById("copy").addEventListener("click",async e=>{const b=e.currentTarget;
+try{await navigator.clipboard.writeText("767239953");b.textContent="Numéro copié"}catch(x){const r=document.createRange();r.selectNodeContents(document.getElementById("num"));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="Numéro sélectionné : copiez-le"}});
+upd();
+</script>
+</body>
+</html>
