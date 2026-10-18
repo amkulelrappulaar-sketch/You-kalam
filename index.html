@@ -41,10 +41,7 @@ ol{padding-left:20px;margin:0}li{margin-bottom:6px}
 </div>
 
 <h2>Choisissez vos billets</h2>
-<div class="row"><div><div class="px">500 F</div><div class="warn" style="margin:0">Billet simple</div></div>
-<div class="qty"><button type="button" data-p="500" data-d="-1" aria-label="Retirer un billet à 500 F">−</button><output id="o500">0</output><button type="button" data-p="500" data-d="1" aria-label="Ajouter un billet à 500 F">+</button></div></div>
-<div class="row"><div><div class="px">1 000 F</div><div class="warn" style="margin:0">Billet 1 000 F</div></div>
-<div class="qty"><button type="button" data-p="1000" data-d="-1" aria-label="Retirer un billet à 1 000 F">−</button><output id="o1000">0</output><button type="button" data-p="1000" data-d="1" aria-label="Ajouter un billet à 1 000 F">+</button></div></div>
+<div id="prices"></div>
 <p class="tot">Total : <span id="tot">0 F</span></p>
 
 <h2>Comment payer</h2>
@@ -69,23 +66,35 @@ ol{padding-left:20px;margin:0}li{margin-bottom:6px}
 
 <p class="warn">Payez uniquement au numéro affiché sur cette page. Le billet est envoyé après vérification du paiement. Un billet ne permet qu’une seule entrée : ne partagez pas son QR code.</p>
 </main>
+<script src="gestion/config.js"></script>
 <script>
-const WAVE="221767239953";const q={500:0,1000:0};
+const WAVE="221767239953";
+const PRICES=(window.YK_CONFIG&&Array.isArray(YK_CONFIG.PRICES)&&YK_CONFIG.PRICES.length)?YK_CONFIG.PRICES.map(Number):[500,1000];
+const q={};PRICES.forEach(p=>q[p]=0);
 const fmt=n=>n.toLocaleString("fr-FR").replace(/[\u202f\u00a0]/g," ")+" F";
-function upd(){const t=q[500]*500+q[1000]*1000;
-document.getElementById("o500").textContent=q[500];document.getElementById("o1000").textContent=q[1000];
+const box=document.getElementById("prices");
+PRICES.forEach((p,i)=>{
+ const row=document.createElement("div");row.className="row";
+ row.innerHTML='<div><div class="px"></div><div class="warn" style="margin:0">Billet</div></div><div class="qty"><button type="button" data-d="-1">\u2212</button><output>0</output><button type="button" data-d="1">+</button></div>';
+ row.querySelector(".px").textContent=fmt(p);
+ const bs=row.querySelectorAll("button"),o=row.querySelector("output");o.id="o"+p;
+ bs[0].dataset.p=p;bs[1].dataset.p=p;
+ bs[0].setAttribute("aria-label","Retirer un billet \u00e0 "+fmt(p));bs[1].setAttribute("aria-label","Ajouter un billet \u00e0 "+fmt(p));
+ box.append(row)});
+function upd(){const t=PRICES.reduce((s,p)=>s+q[p]*p,0);
+PRICES.forEach(p=>document.getElementById("o"+p).textContent=q[p]);
 document.getElementById("tot").textContent=fmt(t);
 const nom=document.getElementById("nom").value.trim(),ref=document.getElementById("ref").value.trim();
 const a=document.getElementById("wa"),ok=t>0&&nom&&ref;
 a.setAttribute("aria-disabled",ok?"false":"true");
 if(!ok){a.removeAttribute("href");return}
-const parts=[];if(q[500])parts.push(q[500]+" billet(s) à 500 F");if(q[1000])parts.push(q[1000]+" billet(s) à 1 000 F");
-const msg="Bonjour, je souhaite acheter "+parts.join(" et ")+" pour le Concert You Kalama (24 décembre 2026).\nTotal payé par Wave : "+fmt(t)+"\nNom : "+nom+"\nRéférence du paiement Wave : "+ref;
+const parts=PRICES.filter(p=>q[p]).map(p=>q[p]+" billet(s) \u00e0 "+fmt(p));
+const msg="Bonjour, je souhaite acheter "+parts.join(" et ")+" pour le Concert You Kalama (24 d\u00e9cembre 2026).\nTotal pay\u00e9 par Wave : "+fmt(t)+"\nNom : "+nom+"\nR\u00e9f\u00e9rence du paiement Wave : "+ref;
 a.href="https://wa.me/"+WAVE+"?text="+encodeURIComponent(msg)}
 document.querySelectorAll(".qty button").forEach(b=>b.addEventListener("click",()=>{const p=b.dataset.p;q[p]=Math.max(0,Math.min(10,q[p]+Number(b.dataset.d)));upd()}));
 ["nom","ref"].forEach(i=>document.getElementById(i).addEventListener("input",upd));
 document.getElementById("copy").addEventListener("click",async e=>{const b=e.currentTarget;
-try{await navigator.clipboard.writeText("767239953");b.textContent="Numéro copié"}catch(x){const r=document.createRange();r.selectNodeContents(document.getElementById("num"));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="Numéro sélectionné : copiez-le"}});
+try{await navigator.clipboard.writeText("767239953");b.textContent="Num\u00e9ro copi\u00e9"}catch(x){const r=document.createRange();r.selectNodeContents(document.getElementById("num"));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="Num\u00e9ro s\u00e9lectionn\u00e9 : copiez-le"}});
 upd();
 </script>
 </body>
