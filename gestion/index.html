@@ -70,7 +70,7 @@ video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;background:#
 <form id="f" class="c" autocomplete="off">
 <label for="n">Nom de l’acheteur</label><input id="n" required>
 <label for="p">Téléphone WhatsApp (facultatif)</label><input id="p" type="tel" inputmode="tel" placeholder="77 123 45 67">
-<label for="cat">Catégorie</label><select id="cat"><option value="500">500 F</option><option value="1000">1 000 F</option></select>
+<label for="cat">Prix du billet</label><select id="cat"></select>
 <label for="q">Nombre de billets</label><input id="q" type="number" min="1" max="10" value="1" required>
 <label for="r">Référence du paiement Wave</label><input id="r" required placeholder="Telle qu’affichée dans votre application Wave">
 <label for="a">Montant reçu dans Wave (F)</label><input id="a" type="number" min="0" inputmode="numeric" required>
@@ -111,6 +111,8 @@ const h=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){if(k
 const fmt=n=>n.toLocaleString("fr-FR").replace(/[\u202f\u00a0]/g," ")+" F";
 const hm=ts=>new Date(ts).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
 const short=e=>String(e||"").split("@")[0];
+const PRICES=(Array.isArray(CFG.PRICES)&&CFG.PRICES.length)?CFG.PRICES.map(Number):[500,1000];
+$("#cat").replaceChildren(...PRICES.map(p=>h("option",{value:String(p)},fmt(p))));
 
 /* ---------- Bibliothèques QR : dossier vendor/ d'abord, cdnjs en secours ---------- */
 function load(srcs){return new Promise(res=>{let i=0;const n=()=>{if(i>=srcs.length)return res(false);const s=document.createElement("script");s.src=srcs[i++];s.onload=()=>res(true);s.onerror=()=>{s.remove();n()};document.head.append(s)};n()})}
@@ -228,7 +230,7 @@ async function loadList(){const lm=$("#lmsg");lm.textContent="Chargement…";
  catch(x){lm.textContent="Impossible d’actualiser : "+x.message}}
 const act=()=>T.filter(t=>t.status!=="cancelled");
 function render(){const a=act(),by=c=>a.filter(t=>t.cat===c).length,used=a.filter(t=>t.status==="used").length;
- $("#st").replaceChildren(...[["Billets émis",a.length+" / "+EV.cap],["Entrés",used],["À 500 F",by(500)],["À 1 000 F",by(1000)],["Ventes déclarées",fmt(by(500)*500+by(1000)*1000)],["Places restantes",EV.cap-a.length]].map(([l,v])=>h("div",{},h("b",{},String(v)),l)));
+ $("#st").replaceChildren(...[["Billets émis",a.length+" / "+EV.cap],["Entrés",used],...PRICES.map(p=>["À "+fmt(p),by(p)]),["Ventes déclarées",fmt(a.reduce((s,t)=>s+t.cat,0))],["Places restantes",EV.cap-a.length]].map(([l,v])=>h("div",{},h("b",{},String(v)),l)));
  const q=$("#s").value.trim().toLowerCase(),rows=T.filter(t=>!q||(t.name+t.code+t.ref).toLowerCase().includes(q));
  $("#list").replaceChildren(...rows.map(t=>h("div",{class:"c"},h("b",{},t.name)," ",h("span",{class:"tag"},t.status==="valid"?"Valide":t.status==="used"?"Utilisé "+hm(t.used_at):"Annulé"),
   h("div",{class:"sm"},t.code+" · "+fmt(t.cat)+" · réf. "+t.ref+(t.created_by?" · par "+short(t.created_by):"")),
